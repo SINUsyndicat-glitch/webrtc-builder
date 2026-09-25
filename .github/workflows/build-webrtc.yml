@@ -1,13 +1,12 @@
 name: Build WebRTC for AArch64
 
 on:
-  workflow_dispatch: # يتيح لك تشغيل البناء يدوياً بضغط زر من موقع جيت هب
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      # 1. تفريغ مساحة القرص الصلب
       - name: Free Disk Space
         uses: jlumbroso/free-disk-space@main
         with:
@@ -21,29 +20,25 @@ jobs:
       - name: Checkout / Setup Environment
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3 git curl ninja-build
+          sudo apt-get install -y python3 python-is-python3 git curl ninja-build
 
-      # 2. تحميل أدوات جوجل depot_tools وإضافتها للمسار
       - name: Install depot_tools
         run: |
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
 
-      # 3. جلب مصادر WebRTC
       - name: Fetch WebRTC Source
         run: |
           mkdir webrtc_src && cd webrtc_src
           fetch --nohooks webrtc
           gclient sync
 
-      # 4. توليد إعدادات البناء عبر GN وتجميع المكتبة
       - name: Generate and Build
         run: |
           cd webrtc_src/src
           gn gen out/Release --args='is_debug=false is_component_build=false rtc_include_tests=false rtc_build_examples=false rtc_build_tools=false use_custom_libcxx=false'
           ninja -C out/Release webrtc
 
-      # 5. رفع الملف الناتج (Artifact) لتتمكن من تحميله
       - name: Upload WebRTC Library
         uses: actions/upload-artifact@v4
         with:
