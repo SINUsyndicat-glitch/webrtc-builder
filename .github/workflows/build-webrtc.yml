@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      # 1. تفريغ مساحة القرص الصلب (مهم جداً لأن WebRTC ضخم جداً ويحتاج مساحة فارغة)
+      # 1. تفريغ مساحة القرص الصلب
       - name: Free Disk Space
         uses: jlumbroso/free-disk-space@main
         with:
@@ -23,11 +23,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y python3 git curl ninja-build
 
-      # 2. تحميل أدوات جوجل depot_tools
+      # 2. تحميل أدوات جوجل depot_tools وإضافتها للمسار
       - name: Install depot_tools
         run: |
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-          echo "$PWD/depot_tools" >> $GITHUB_PATH
+          echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
 
       # 3. جلب مصادر WebRTC
       - name: Fetch WebRTC Source
